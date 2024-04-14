@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
 
 public enum Direction
 {
@@ -16,20 +12,37 @@ public enum Direction
 public class CubeAppr : MonoBehaviour
 {
     public AnimationCurve curve;
-    public Vector3 targetAngle;
     public Cube cube;
-    public Direction direction;
     public float rotateTime = 0.5f;
+    public bool isFalling = false;
+    public static CubeAppr instance;
+    
+    private Direction direction;
     private Vector3 position;
     private Vector3 offset;
     private float rotateTimer = 0.0f;
+    private float fallingTimer = 0.0f;
     private CubeState nextState;
     private Vector3 angle;
+    private Vector3 targetAngle;
     public RotationState rotationState { get; private set; }
-    
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     void Update()
     {
-        if (rotationState == RotationState.ROTATING)
+        if (isFalling)
+        {
+            if (fallingTimer < 5.0f)
+            {
+                transform.parent.Translate(0.0f, -(fallingTimer / 5.0f) * 20.0f, 0.0f);
+            }
+            fallingTimer += Time.deltaTime;
+        }
+        else if (rotationState == RotationState.ROTATING)
         {
             if (rotateTimer > rotateTime)
             {
@@ -146,5 +159,12 @@ public class CubeAppr : MonoBehaviour
         targetAngle = Vector3.zero;
         rotationState = RotationState.STATIONARY;
         rotateTimer = 0.0f;
+        if (!Ground.instance.PlayerOnGround(cube))
+        {
+            isFalling = true;
+            if(GameManager.instance.State != GameState.WIN)
+                GameManager.instance.ChangeGameState(GameState.DEAD);
+            Debug.Log("end");
+        }
     }
 }

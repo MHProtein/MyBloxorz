@@ -20,21 +20,23 @@ public class CubeController : MonoBehaviour
 
     private void Update()
     {
+        if (CubeAppr.instance.isFalling)
+            return;
         if (cube.rotationState == RotationState.STATIONARY)
         {
-            if (Input.GetKeyDown(KeyCode.W))
+            if (Input.GetKey(KeyCode.W))
             {
                 cube.BeginRotation(Direction.FORWARD);
             }
-            if (Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKey(KeyCode.S))
             {
                 cube.BeginRotation(Direction.BACK);
             }
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKey(KeyCode.A))
             {
                 cube.BeginRotation(Direction.LEFT);
             }
-            if (Input.GetKeyDown(KeyCode.D))
+            if (Input.GetKey(KeyCode.D))
             {
                 cube.BeginRotation(Direction.RIGHT);
             }
