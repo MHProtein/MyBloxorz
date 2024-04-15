@@ -7,14 +7,19 @@ public enum GameState
 {
     WIN,
     DEAD,
-    PLAYING
+    PLAYING,
+    AUTOSOLVE
 }
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    private GameState lastState;
     public GameState State { get; private set; }
 
+    public delegate void onGameStateChanged(GameState oldState, GameState newState);
+    public static event onGameStateChanged OnGameStateChanged;
+    
     private void Awake()
     {
         ChangeGameState(GameState.PLAYING);
@@ -25,6 +30,7 @@ public class GameManager : MonoBehaviour
     {
         if (State == newState)
             return;
+        lastState = State;
         State = newState;
         switch (newState)
         {
@@ -37,7 +43,10 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.PLAYING:
                 break;
+            case GameState.AUTOSOLVE:
+                break;
         }
+        OnGameStateChanged?.Invoke(lastState, State);
     }
 
     void Start()

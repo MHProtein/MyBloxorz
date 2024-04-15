@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum Direction
@@ -15,6 +16,7 @@ public class CubeAppr : MonoBehaviour
     public Cube cube;
     public float rotateTime = 0.5f;
     public bool isFalling = false;
+    public bool isSolving = false;
     public static CubeAppr instance;
     
     private Direction direction;
@@ -30,6 +32,12 @@ public class CubeAppr : MonoBehaviour
     private void Awake()
     {
         instance = this;
+    }
+
+    private void Start()
+    {
+        cube.SolvePosition(CubeState.STAND, transform.position);
+        cube.GetHeuristicValue();
     }
 
     void Update()
@@ -60,90 +68,15 @@ public class CubeAppr : MonoBehaviour
         rotationState = RotationState.ROTATING;
         this.direction = direction;
         position = transform.position;
-        switch (cube.state)
-        {
-            case CubeState.STAND:
-                switch (direction)
-                {
-                    case Direction.FORWARD:
-                        offset = new Vector3(0.0f, 1.0f, -0.5f);
-                        targetAngle.x = 90.0f;
-                        nextState = CubeState.LIE_VERTICAL;
-                        break;
-                    case Direction.BACK:
-                        offset = new Vector3(0.0f, 1.0f, 0.5f);
-                        targetAngle.x = -90.0f;
-                        nextState = CubeState.LIE_VERTICAL;
-                        break;
-                    case Direction.LEFT:
-                        offset = new Vector3(0.5f, 1.0f, 0.0f);
-                        targetAngle.z = 90.0f;
-                        nextState = CubeState.LIE_HORIZONTAL;
-                        break;
-                    case Direction.RIGHT:
-                        offset = new Vector3(-0.5f, 1.0f, 0.0f);
-                        targetAngle.z = -90.0f;
-                        nextState = CubeState.LIE_HORIZONTAL;
-                        break;
-                }
-                break;
-            case CubeState.LIE_HORIZONTAL:
-                switch (direction)
-                {
-                    case Direction.FORWARD:
-                        offset = new Vector3(0.0f, 0.5f, -0.5f);
-                        targetAngle.x = 90.0f;
-                        nextState = CubeState.LIE_HORIZONTAL;
-                        break;
-                    case Direction.BACK:
-                        offset = new Vector3(0.0f, 0.5f, 0.5f);
-                        targetAngle.x = -90.0f;
-                        nextState = CubeState.LIE_HORIZONTAL;
-                        break;
-                    case Direction.LEFT:
-                        offset = new Vector3(1.0f, 0.5f, 0.0f);
-                        targetAngle.z = 90.0f;
-                        nextState = CubeState.STAND;
-                        break;
-                    case Direction.RIGHT:
-                        offset = new Vector3(-1.0f, 0.5f, 0.0f);
-                        targetAngle.z = -90.0f;
-                        nextState = CubeState.STAND;
-                        break;
-                }
-                break;
-            case CubeState.LIE_VERTICAL:
-                switch (direction)
-                {
-                    case Direction.FORWARD:
-                        offset = new Vector3(0.0f, 0.5f, -1.0f);
-                        targetAngle.x = 90.0f;
-                        nextState = CubeState.STAND;
-                        break;
-                    case Direction.BACK:
-                        offset = new Vector3(0.0f, 0.5f, 1.0f);
-                        targetAngle.x = -90.0f;
-                        nextState = CubeState.STAND;
-                        break;
-                    case Direction.LEFT:
-                        offset = new Vector3(0.5f, 0.5f,0.0f);
-                        targetAngle.z = 90.0f;
-                        nextState = CubeState.LIE_VERTICAL;
-                        break;
-                    case Direction.RIGHT:
-                        offset = new Vector3(-0.5f, 0.5f, 0.0f);
-                        targetAngle.z = -90.0f;
-                        nextState = CubeState.LIE_VERTICAL;
-                        break;
-                }
-                break;
-        }
+        var ret = Utilities.BeginRotation(cube, this.direction);
+        offset = ret.offset;
+        targetAngle = ret.targetAngle;
+        nextState = ret.nextState;
     }
-
+    
     public void Rotate()
     {
-        var mat = Matrix4x4.Translate(-offset) * Matrix4x4.Rotate(Quaternion.Euler(angle)) *
-                  Matrix4x4.Translate(offset) * Matrix4x4.Rotate(Quaternion.LookRotation(cube.axis_z, cube.axis_y));
+        var mat = Utilities.Rotate(cube, angle, offset);
         transform.rotation = mat.rotation;
         
         if(cube.state == CubeState.STAND)

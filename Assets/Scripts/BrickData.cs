@@ -1,21 +1,36 @@
-using System;
+﻿using System;
 using UnityEngine;
 
-[ExecuteAlways]
-public class Brick : MonoBehaviour
+[Serializable]
+public class BrickData
 {
     public Vector3 position;
     public Vector3Int intPosition;
     
-    protected virtual void Awake()
+    public BrickData()
     {
-        position = transform.position;
+        position = new Vector3();
         position.y = 0.0f;
         intPosition.x = Mathf.RoundToInt(position.x);
         intPosition.z = Mathf.RoundToInt(position.z);
         intPosition.y = 0;
     }
-
+    
+    public BrickData(Vector3 pos)
+    {
+        position = pos;
+        position.y = 0.0f;
+        intPosition.x = Mathf.RoundToInt(position.x);
+        intPosition.z = Mathf.RoundToInt(position.z);
+        intPosition.y = 0;
+    }
+    
+    public BrickData(BrickData data)
+    {
+        position = data.position;
+        intPosition = data.intPosition;
+    }
+    
     public virtual int OnBrick(Cube cube)
     {
         int counter = 0;
@@ -33,23 +48,9 @@ public class Brick : MonoBehaviour
         }
         return counter;
     }
-
-#if UNITY_EDITOR
-    protected virtual void Update()
+    
+    public virtual void SetActive(bool active)
     {
-        if (UnityEditor.EditorApplication.isPlaying)
-        {
-            return;
-        }
-
-        var pos = transform.position;
-        position.x = Mathf.RoundToInt(pos.x);
-        position.z = Mathf.RoundToInt(pos.z);
-        position.y = -0.10f;
-        intPosition.x = Mathf.RoundToInt(position.x);
-        intPosition.z = Mathf.RoundToInt(position.z);
-        intPosition.y = 0;
-        transform.position = position;
     }
-#endif
+    
 }

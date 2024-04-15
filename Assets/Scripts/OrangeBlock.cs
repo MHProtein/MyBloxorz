@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.PlayerLoop;
 
 [ExecuteAlways]
-public class OrangeBrick : Brick
+public class OrangeBlock : Block
 {
     private Rigidbody rigidbody;
     private bool fall;
@@ -14,6 +14,8 @@ public class OrangeBrick : Brick
         int cnt = base.OnBrick(cube);
         if (cnt == 2)
         {
+            if (GameManager.instance.State == GameState.AUTOSOLVE)
+                return 0;
             CubeAppr.instance.isFalling = true;
             GameManager.instance.ChangeGameState(GameState.DEAD);
             fall = true;
@@ -24,6 +26,8 @@ public class OrangeBrick : Brick
     protected override void Update()
     {
         base.Update();
+        if (GameManager.instance.State == GameState.AUTOSOLVE)
+            return;
         if (fall)
         {
             if (fallingTimer < 5.0f)

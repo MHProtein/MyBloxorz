@@ -20,6 +20,8 @@ public class CubeController : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.State != GameState.PLAYING)
+            return;
         if (CubeAppr.instance.isFalling)
             return;
         if (cube.rotationState == RotationState.STATIONARY)

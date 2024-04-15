@@ -3,12 +3,13 @@ using UnityEngine;
 
 public class Ground : MonoBehaviour
 {
-    public List<Brick> bricks;
+    public List<Block> bricks;
     public static Ground instance;
+    public Vector3Int terminalPos;
     private void Awake()
     {
-        bricks = new List<Brick>();
-        bricks.AddRange(GetComponentsInChildren<Brick>());
+        bricks = new List<Block>();
+        bricks.AddRange(GetComponentsInChildren<Block>());
         instance = this;
     }
 
